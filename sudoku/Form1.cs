@@ -13,10 +13,10 @@ namespace sudoku
     public partial class Form1 : Form
     {
         int[,] num = new int[9, 9];
-        Button[,] cell = new Button[9, 9];
+        MyButton[,] cell = new MyButton[9, 9];
         Random rnd = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-
         Form2 f2 = new Form2();
+        int lives;
 
         public Form1()
         {
@@ -28,7 +28,7 @@ namespace sudoku
                 {
                     num[i, j] = ((j * 3 + j / 3 + i) % 9 + 1);
 
-                    cell[i, j] = new Button();
+                    cell[i, j] = new MyButton();
 
                     cell[i, j].Size = new Size(40, 40);
                     cell[i, j].FlatStyle = FlatStyle.Flat;
@@ -36,7 +36,8 @@ namespace sudoku
                     cell[i, j].Font = new Font("century gothic", 20, FontStyle.Bold);
                     cell[i, j].Top = 25 + j * 42;
                     cell[i, j].Left = 25 + i * 42;
-                    cell[i, j].Text = num[i, j].ToString();
+                    cell[i, j].Value = num[i, j];
+                    cell[i, j].Text = cell[i, j].Value.ToString();
 
                     int div = j / 3;
                     switch (div)
@@ -67,42 +68,20 @@ namespace sudoku
                 }
             }
 
-            Swap(20);
+            GenerateNewGame();
         }
 
-        private void SwapSelector(int a, int b)
+        private void RefreshCellText()
         {
-            switch (a)
+            for (int j = 0; j < 9; j++)
             {
-                case 0:
-                    b = rnd.Next(1, 3);
-                    break;
-                case 1:
-                    b = rnd.Next(0, 3);
-                    break;
-                case 2:
-                    b = rnd.Next(0, 2);
-                    break;
-                case 3:
-                    b = rnd.Next(4, 6);
-                    break;
-                case 4:
-                    b = rnd.Next(3, 6);
-                    break;
-                case 5:
-                    b = rnd.Next(3, 5);
-                    break;
-                case 6:
-                    b = rnd.Next(7, 9);
-                    break;
-                case 7:
-                    b = rnd.Next(6, 9);
-                    break;
-                case 8:
-                    b = rnd.Next(6, 8);
-                    break;
+                for (int i = 0; i < 9; i++)
+                {
+                    cell[i, j].Value = num[i, j];
+                    cell[i, j].Text = cell[i, j].Value.ToString();
+                }
             }
-        }
+        }       
 
         private int Swap(int counter)
         {
@@ -112,27 +91,85 @@ namespace sudoku
             int k = rnd.Next(9);
             int z = 0;
 
-            SwapSelector(k, z);
+            switch (k)
+            {
+                case 0:
+                    z = rnd.Next(1, 3);
+                    break;
+                case 1:
+                    z = rnd.Next(0, 3);
+                    break;
+                case 2:
+                    z = rnd.Next(0, 2);
+                    break;
+                case 3:
+                    z = rnd.Next(4, 6);
+                    break;
+                case 4:
+                    z = rnd.Next(3, 6);
+                    break;
+                case 5:
+                    z = rnd.Next(3, 5);
+                    break;
+                case 6:
+                    z = rnd.Next(7, 9);
+                    break;
+                case 7:
+                    z = rnd.Next(6, 9);
+                    break;
+                case 8:
+                    z = rnd.Next(6, 8);
+                    break;
+            }
 
             for (int j = 0; j < 9; j++)
             {
-                string temp;
-                temp = cell[k, j].Text;
-                cell[k, j].Text = cell[z, j].Text;
-                cell[z, j].Text = temp;
+                int temp;
+                temp = num[k, j];
+                num[k, j] = num[z, j];
+                num[z, j] = temp;
             }
 
             int x = rnd.Next(9);
             int y = 0;
 
-            SwapSelector(x, y);
+            switch (x)
+            {
+                case 0:
+                    y = rnd.Next(1, 3);
+                    break;
+                case 1:
+                    y = rnd.Next(0, 3);
+                    break;
+                case 2:
+                    y = rnd.Next(0, 2);
+                    break;
+                case 3:
+                    y = rnd.Next(4, 6);
+                    break;
+                case 4:
+                    y = rnd.Next(3, 6);
+                    break;
+                case 5:
+                    y = rnd.Next(3, 5);
+                    break;
+                case 6:
+                    y = rnd.Next(7, 9);
+                    break;
+                case 7:
+                    y = rnd.Next(6, 9);
+                    break;
+                case 8:
+                    y = rnd.Next(6, 8);
+                    break;
+            }
 
             for (int i = 0; i < 9; i++)
             {
-                string temp;
-                temp = cell[i, x].Text;
-                cell[i, x].Text = cell[i, y].Text;
-                cell[i, y].Text = temp;
+                int temp;
+                temp = num[i, x];
+                num[i, x] = num[i, y];
+                num[i, y] = temp;
             }
             return Swap(counter - 1);
         }
@@ -162,25 +199,76 @@ namespace sudoku
             }
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
-        {
-            if (checkBox1.Checked)
-                HideNumbers();
-            else
-                ShowNumbers();
-        }
-
         private void cell_Click(object sender, EventArgs e)
         {
-            Button b = (Button)sender;
-            if (checkBox1.Checked && b.Text == "")
+            MyButton b = (MyButton)sender;
+            if (b.Text == "")
             {
                 f2.Location = new Point(this.Left + b.Left + b.Width + 10, this.Top + b.Top + b.Height + 32);
                 if (f2.ShowDialog() == DialogResult.OK)
                 {
-                    b.Text = f2.entered;
+                    if (f2.entered == b.Value.ToString())
+                    {
+                        b.Text = f2.entered;
+                        CheckGameOver();
+                    }
+                    else
+                    {
+                        lives--;
+                        labelLives.Text = lives.ToString();
+                        MessageBox.Show("Неверное число!");
+                        CheckGameOver();
+                    }
                 }
             }
+        }
+
+        private void GenerateNewGame()
+        {
+            Swap(25);
+            RefreshCellText();
+            lives = 3;
+            labelLives.Text = lives.ToString();
+        }
+
+        private void CheckGameOver()
+        {
+            bool end = true;
+            foreach (MyButton c in this.Controls.OfType<MyButton>())
+                if (c.Text == "")
+                    end = false;
+            if (lives == 0)
+            {                
+                MessageBox.Show("Игра окончена, слишком много ошибок!\nПопробуй заново!");
+                ShowNumbers();
+            }
+
+            if (end)
+                MessageBox.Show("Ты справился!\nПоздравляем!");
+        }
+
+        private void новаяИграToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GenerateNewGame();
+            HideNumbers();
+        }
+
+        private void сдатьсяToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ShowNumbers();
+            labelLives.Text = "0";
+        }
+
+        private void правилаИгрыToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("Заполни свободные клетки цифрами от 1 до 9 так, " +
+                "чтобы в каждой строке, в каждом столбце и в каждом малом квадрате 3×3 " +
+                "каждая цифра встречалась бы только один раз.");
+        }
+
+        private void оПрограммеToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("arthur56betw1n, 2018");
         }
     }
 }
