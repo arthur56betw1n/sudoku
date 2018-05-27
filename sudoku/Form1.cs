@@ -17,6 +17,7 @@ namespace sudoku
         Random rnd = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
         Form2 f2 = new Form2();
         int lives;
+        DateTime timer;
 
         public Form1()
         {
@@ -81,7 +82,7 @@ namespace sudoku
                     cell[i, j].Text = cell[i, j].Value.ToString();
                 }
             }
-        }       
+        }
 
         private int Swap(int counter)
         {
@@ -238,23 +239,29 @@ namespace sudoku
                 if (c.Text == "")
                     end = false;
             if (lives == 0)
-            {                
-                MessageBox.Show("Игра окончена, слишком много ошибок!\nПопробуй заново!");
+            {
+                timer1.Stop();
+                MessageBox.Show("Игра окончена, слишком много ошибок!\nПопробуй заново!");                
                 ShowNumbers();
             }
 
             if (end)
-                MessageBox.Show("Ты справился!\nПоздравляем!");
+            {
+                timer1.Stop();
+                MessageBox.Show("Ты справился! Поздравляем!\nТвое время: " + labelTimer.Text);
+            }
         }
 
         private void новаяИграToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GenerateNewGame();
             HideNumbers();
+            TimerGo();
         }
 
         private void сдатьсяToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            timer1.Stop();
             ShowNumbers();
             labelLives.Text = "0";
         }
@@ -269,6 +276,19 @@ namespace sudoku
         private void оПрограммеToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             MessageBox.Show("arthur56betw1n, 2018");
+        }
+
+        private void TimerGo()
+        {
+            timer = new DateTime(0, 0);
+            timer1.Interval = 10;
+            timer1.Start();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            timer = timer.AddSeconds(1);
+            labelTimer.Text = timer.ToString("mm:ss");
         }
     }
 }
