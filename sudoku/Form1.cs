@@ -15,9 +15,9 @@ namespace sudoku
         int[,] num = new int[9, 9];
         MyButton[,] cell = new MyButton[9, 9];
         Random rnd = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-        Form2 f2 = new Form2();
+        Form2 inputform = new Form2();
         int lives;
-        DateTime timer;
+        DateTime time;
 
         public Form1()
         {
@@ -205,12 +205,12 @@ namespace sudoku
             MyButton b = (MyButton)sender;
             if (b.Text == "")
             {
-                f2.Location = new Point(this.Left + b.Left + b.Width + 10, this.Top + b.Top + b.Height + 32);
-                if (f2.ShowDialog() == DialogResult.OK)
+                inputform.Location = new Point(this.Left + b.Left + b.Width + 10, this.Top + b.Top + b.Height + 32);
+                if (inputform.ShowDialog() == DialogResult.OK)
                 {
-                    if (f2.entered == b.Value.ToString())
+                    if (inputform.entered == b.Value.ToString())
                     {
-                        b.Text = f2.entered;
+                        b.Text = inputform.entered;
                         CheckGameOver();
                     }
                     else
@@ -241,10 +241,9 @@ namespace sudoku
             if (lives == 0)
             {
                 timer1.Stop();
-                MessageBox.Show("Игра окончена, слишком много ошибок!\nПопробуй заново!");                
+                MessageBox.Show("Игра окончена, слишком много ошибок!\nПопробуй заново!");
                 ShowNumbers();
             }
-
             if (end)
             {
                 timer1.Stop();
@@ -256,7 +255,7 @@ namespace sudoku
         {
             GenerateNewGame();
             HideNumbers();
-            TimerGo();
+            TimerStart();
         }
 
         private void сдатьсяToolStripMenuItem_Click(object sender, EventArgs e)
@@ -278,17 +277,93 @@ namespace sudoku
             MessageBox.Show("arthur56betw1n, 2018");
         }
 
-        private void TimerGo()
+        private void TimerStart()
         {
-            timer = new DateTime(0, 0);
-            timer1.Interval = 10;
+            time = new DateTime(0, 0);
+            timer1.Interval = 1000;
             timer1.Start();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
-            timer = timer.AddSeconds(1);
-            labelTimer.Text = timer.ToString("mm:ss");
+            time = time.AddSeconds(1);
+            labelTimer.Text = time.ToString("mm:ss");
+        }
+
+        private void ChangeColorTheme1()
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    int div = j / 3;
+                    switch (div)
+                    {
+                        case 0:
+                            cell[i, j].BackColor = Color.LightBlue;
+
+                            if (i / 3 == 1)
+                                cell[i, j].BackColor = Color.LightSlateGray;
+                            break;
+                        case 1:
+                            cell[i, j].BackColor = Color.LightSlateGray;
+
+                            if (i / 3 == 1)
+                                cell[i, j].BackColor = Color.LightBlue;
+                            break;
+                        case 2:
+                            goto case 0;
+                    }
+
+                    if (cell[i, j].BackColor == Color.LightBlue)
+                        cell[i, j].ForeColor = Color.DimGray;
+                    else
+                        cell[i, j].ForeColor = Color.White;
+                }
+            }
+        }
+
+        private void ChangeColorTheme2()
+        {
+            for (int j = 0; j < 9; j++)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    int div = j / 3;
+                    switch (div)
+                    {
+                        case 0:
+                            cell[i, j].BackColor = Color.LightYellow;
+
+                            if (i / 3 == 1)
+                                cell[i, j].BackColor = Color.SandyBrown;
+                            break;
+                        case 1:
+                            cell[i, j].BackColor = Color.SandyBrown;
+
+                            if (i / 3 == 1)
+                                cell[i, j].BackColor = Color.LightYellow;
+                            break;
+                        case 2:
+                            goto case 0;
+                    }
+
+                    if (cell[i, j].BackColor == Color.LightYellow)
+                        cell[i, j].ForeColor = Color.SandyBrown;
+                    else
+                        cell[i, j].ForeColor = Color.White;
+                }
+            }
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            ChangeColorTheme1();
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+            ChangeColorTheme2();
         }
     }
 }
